@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ event.name }} — BoothCRM{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div class="page-title-block">
+        <h1>{{ event.name }}</h1>
+        <div class="page-subtitle">
+            {{ event.location|default:"" }}
+            {% if event.start_date %}
+                &mdash; {{ event.start_date|date:"M d" }} – {{ event.end_date|date:"M d, Y" }}
+            {% endif %}
+        </div>
+    </div>
+    <div class="page-actions">
+        {% if request.user.is_authenticated %}
+            <a href="{% url 'event_edit' event.pk %}" class="btn btn-primary">Edit Event</a>
+        {% endif %}
+        {% if request.user.is_superuser %}
+            <form method="POST" action="{% url 'event_delete' event.pk %}" style="display:inline" onsubmit="return confirm('Delete this event? This cannot be undone.')">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+        {% endif %}
+        <a href="{% url 'events_list' %}" class="btn btn-ghost">← Back</a>
+    </div>
+</div>
+
+<!-- KPI Row -->
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-label">Status</div>
+        <div class="kpi-value">
+            {% if event.status == 'open' %}
+                <span class="badge badge-green">{{ event.get_status_display }}</span>
+            {% elif event.status == 'planning' %}
+                <span class="badge badge-yellow">{{ event.get_status_display }}</span>
+            {% elif event.status == 'cancelled' %}
+                <span class="badge badge-red">{{ event.get_status_display }}</span>
+            {% else %}
+                <span class="badge badge-gray">{{ event.get_status_display }}</span>
+            {% endif %}
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Total Revenue</div>
+        <div class="kpi-value">${{ total_revenue|floatformat:0 }}</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Open Pipeline</div>
+        <div class="kpi-value">${{ open_pipeline|floatformat:0 }}</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Vendors Booked</div>
+        <div class="kpi-value">{{ won_vendors }} / {{ event.vendor_capacity|default:"—" }}</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Food Vendors</div>
+        <div class="kpi-value">{{ won_food_vendors }} / {{ event.food_vendor_capacity|default:"—" }}</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Guests Booked</div>
+        <div class="kpi-value">{{ won_guests }} / {{ event.guest_capacity|default:"—" }}</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Signings</div>
+        <div class="kpi-value">{{ won_signings }} / {{ event.signing_capacity|default:"—" }}</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Panels</div>
+        <div class="kpi-value">{{ won_panels }} / {{ event.panel_room_capacity|default:"—" }}</div>
+    </div>
+</div>
+
+<div class="grid-sidebar">
+
+    <!-- Left Column -->
+    <div>
+        <div class="card mb-2">
+            <div class="card-title">Event Details</div>
+            <div class="detail-row">
+                <span class="detail-label">Manager</span>
+                <span class="detail-value">{{ event.event_manager.get_full_name|default:event.event_manager.username|default:"Unassigned" }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Location</span>
+                <span class="detail-value">{{ event.location|default:"—" }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Start Date</span>
+                <span class="detail-value">{{ event.start_date|date:"M d, Y"|default:"—" }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">End Date</span>
+                <span class="detail-value">{{ event.end_date|date:"M d, Y"|default:"—" }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Attendance Cap</span>
+                <span class="detail-value">{{ event.total_attendance_cap|default:"—" }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Activity Room</span>
+                <span class="detail-value">{{ won_photo_ops }} / {{ event.activity_room_capacity|default:"—" }}</span>
+            </div>
+            {% if event.custom_room_1_name %}
+            <div class="detail-row">
+                <span class="detail-label">{{ event.custom_room_1_name }}</span>
+                <span class="detail-value">Cap: {{ event.custom_room_1_capacity|default:"—" }}</span>
+            </div>
+            {% endif %}
+            {% if event.custom_room_2_name %}
+            <div class="detail-row">
+                <span class="detail-label">{{ event.custom_room_2_name }}</span>
+                <span class="detail-value">Cap: {{ event.custom_room_2_capacity|default:"—" }}</span>
+            </div>
+            {% endif %}
+            {% if event.custom_room_3_name %}
+            <div class="detail-row">
+                <span class="detail-label">{{ event.custom_room_3_name }}</span>
+                <span class="detail-value">Cap: {{ event.custom_room_3_capacity|default:"—" }}</span>
+            </div>
+            {% endif %}
+            {% if event.custom_room_4_name %}
+            <div class="detail-row">
+                <span class="detail-label">{{ event.custom_room_4_name }}</span>
+                <span class="detail-value">Cap: {{ event.custom_room_4_capacity|default:"—" }}</span>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if event.description %}
+        <div class="card mb-2">
+            <div class="card-title">Description</div>
+            <p>{{ event.description }}</p>
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <div class="card-title">Activity Log</div>
+            {% if activity_logs %}
+                <div class="timeline">
+                    {% for log in activity_logs %}
+                    <div class="timeline-item">
+                        <div class="timeline-date">
+                            {{ log.created_at|date:"M d, Y H:i" }} &mdash;
+                            {{ log.performed_by.get_full_name|default:log.performed_by.username|default:"System" }}
+                        </div>
+                        <div class="timeline-text">
+                            <span class="badge badge-gray">{{ log.get_action_display }}</span>
+                            {{ log.description }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No activity yet.</p>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <!-- Right Column -->
+    <div>
+        <div class="card">
+            <div class="card-title">
+                Opportunities
+                {% if request.user.is_authenticated %}
+                    <a href="{% url 'opportunity_create' %}" class="btn btn-ghost">+ Add Opportunity</a>
+                {% endif %}
+            </div>
+            {% if opportunities %}
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Stage</th>
+                            <th>ARR</th>
+                            <th>Owner</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for opp in opportunities %}
+                        <tr>
+                            <td class="link-cell">
+                                <a href="{% url 'opportunity_detail' opp.pk %}">{{ opp.name }}</a>
+                            </td>
+                            <td>{{ opp.get_opportunity_type_display|default:"—" }}</td>
+                            <td>
+                                {% if opp.stage == 'closed_won' %}
+                                    <span class="badge badge-green">{{ opp.get_stage_display }}</span>
+                                {% elif opp.stage == 'closed_lost' %}
+                                    <span class="badge badge-red">{{ opp.get_stage_display }}</span>
+                                {% elif opp.stage == 'negotiating' %}
+                                    <span class="badge badge-yellow">{{ opp.get_stage_display }}</span>
+                                {% else %}
+                                    <span class="badge badge-blue">{{ opp.get_stage_display }}</span>
+                                {% endif %}
+                            </td>
+                            <td>${{ opp.arr|floatformat:0|default:"—" }}</td>
+                            <td>{{ opp.owner.get_full_name|default:opp.owner.username|default:"—" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+                <p>No opportunities yet.</p>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

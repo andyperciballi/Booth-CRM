@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}New Account — BoothCRM{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div class="page-title-block">
+        <h1>New Account</h1>
+        <div class="page-subtitle">Create a new vendor or customer account</div>
+    </div>
+    <div class="page-actions">
+        <a href="{% url 'accounts_list' %}" class="btn btn-ghost">← Cancel</a>
+    </div>
+</div>
+
+<form method="POST">
+    {% csrf_token %}
+    <div class="grid-sidebar">
+
+        <div>
+            <div class="card mb-2">
+                <div class="card-title">Identity</div>
+                <div class="form-group">
+                    <label>Account Name *</label>
+                    <input type="text" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Vertical</label>
+                    <select name="vertical">
+                        <option value="">— Select Vertical —</option>
+                        {% for value, label in vertical_choices %}
+                            <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Website</label>
+                    <input type="url" name="website">
+                </div>
+                <div class="form-group">
+                    <label>HQ Phone</label>
+                    <input type="text" name="hq_phone">
+                </div>
+                <div class="form-group">
+                    <label>General Email</label>
+                    <input type="email" name="general_email">
+                </div>
+                <div class="form-group">
+                    <label>Billing Email</label>
+                    <input type="email" name="billing_email">
+                </div>
+                <div class="form-group">
+                    <label>Billing Address</label>
+                    <input type="text" name="billing_address">
+                </div>
+                <div class="form-group">
+                    <label>Tax ID</label>
+                    <input type="text" name="tax_id">
+                </div>
+                <div class="form-group">
+                    <label>Employee Count</label>
+                    <input type="number" name="employee_count">
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="card mb-2">
+                <div class="card-title">Location</div>
+                <div class="form-group">
+                    <label>HQ Address</label>
+                    <input type="text" name="hq_address">
+                </div>
+                <div class="form-group">
+                    <label>City</label>
+                    <input type="text" name="city">
+                </div>
+                <div class="form-group">
+                    <label>State / Province</label>
+                    <input type="text" name="state_province">
+                </div>
+                <div class="form-group">
+                    <label>Country</label>
+                    <input type="text" name="country">
+                </div>
+            </div>
+
+            <div class="card mb-2">
+                <div class="card-title">CRM</div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        {% for value, label in status_choices %}
+                            <option value="{{ value }}" {% if value == 'prospect' %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>ARR</label>
+                    <input type="number" name="arr" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Account Owner</label>
+                    <select name="account_owner">
+                        <option value="">— Unassigned —</option>
+                        {% for user in users %}
+                            <option value="{{ user.id }}">{{ user.get_full_name|default:user.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="card mb-2">
+                <div class="card-title">Notes & Outreach</div>
+                <div class="form-group">
+                    <label>Notes</label>
+                    <textarea name="notes" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Outreach History</label>
+                    <textarea name="outreach_history" rows="6"></textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Create Account</button>
+        </div>
+
+    </div>
+</form>
+
+{% endblock %}

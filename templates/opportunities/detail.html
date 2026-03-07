@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ opportunity.name }} — BoothCRM{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div class="page-title-block">
+        <h1>{{ opportunity.name }}</h1>
+        <div class="page-subtitle">
+            {% if opportunity.account %}
+                <a href="{% url 'account_detail' opportunity.account.pk %}">{{ opportunity.account.name }}</a> &mdash;
+            {% endif %}
+            {{ opportunity.contact.first_name }} {{ opportunity.contact.last_name }}
+        </div>
+    </div>
+   <div class="page-actions">
+    {% if request.user.is_authenticated %}
+        <a href="{% url 'opportunity_edit' opportunity.pk %}" class="btn btn-primary">Edit Opportunity</a>
+    {% endif %}
+    {% if request.user.is_superuser %}
+        <form method="POST" action="{% url 'opportunity_delete' opportunity.pk %}" style="display:inline" onsubmit="return confirm('Delete this opportunity? This cannot be undone.')">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+    {% endif %}
+    <a href="{% url 'opportunities_list' %}" class="btn btn-ghost">← Back</a>
+</div>
+</div>
+
+<!-- KPI Row -->
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-label">Stage</div>
+        <div class="kpi-value">
+            {% if opportunity.stage == 'closed_won' %}
+                <span class="badge badge-green">{{ opportunity.get_stage_display }}</span>
+            {% elif opportunity.stage == 'closed_lost' %}
+                <span class="badge badge-red">{{ opportunity.get_stage_display }}</span>
+            {% elif opportunity.stage == 'negotiating' %}
+                <span class="badge badge-yellow">{{ opportunity.get_stage_display }}</span>
+            {% elif opportunity.stage == 'prospecting' %}
+                <span class="badge badge-purple">{{ opportunity.get_stage_display }}</span>
+            {% else %}
+                <span class="badge badge-blue">{{ opportunity.get_stage_display }}</span>
+            {% endif %}
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">ARR</div>
+        <div class="kpi-value">${{ opportunity.arr|floatformat:0|default:"0" }}</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Forecast</div>
+        <div class="kpi-value">
+            {% if opportunity.forecast_category %}
+                {% if opportunity.forecast_category == 'in_forecast' %}
+                    <span class="badge badge-green">{{ opportunity.get_forecast_category_display }}</span>
+                {% elif opportunity.forecast_category == 'unlikely' %}
+                    <span class="badge badge-red">{{ opportunity.get_forecast_category_display }}</span>
+                {% elif opportunity.forecast_category == 'stretch' %}
+                    <span class="badge badge-yellow">{{ opportunity.get_forecast_category_display }}</span>
+                {% else %}
+                    <span class="badge badge-gray">{{ opportunity.get_forecast_category_display }}</span>
+                {% endif %}
+            {% else %}
+                —
+            {% endif %}
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Close Date</div>
+        <div class="kpi-value" style="font-size:16px">{{ opportunity.close_date|date:"M d, Y"|default:"—" }}</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Type</div>
+        <div class="kpi-value" style="font-size:16px">{{ opportunity.get_opportunity_type_display|default:"—" }}</div>
+    </div>
+</div>
+
+<div class="grid-sidebar">
+
+    <!-- Left Column -->
+    <div>
+        <div class="card mb-2">
+            <div class="card-title">Opportunity Details</div>
+            <div class="detail-row">
+                <span class="detail-label">Owner</span>
+                <span class="detail-value">{{ opportunity.owner.get_full_name|default:opportunity.owner.username|default:"Unassigned" }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Contact</span>
+                <span class="detail-value">
+                    <a href="{% url 'contact_detail' opportunity.contact.pk %}">
+                        {{ opportunity.contact.first_name }} {{ opportunity.contact.last_name }}
+                    </a>
+                </span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Account</span>
+                <span class="detail-value">
+                    {% if opportunity.account %}
+                        <a href="{% url 'account_detail' opportunity.account.pk %}">{{ opportunity.account.name }}</a>
+                    {% else %}
+                        —
+                    {% endif %}
+                </span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Event</span>
+                <span class="detail-value">
+                    {% if opportunity.event %}
+                        <a href="{% url 'event_detail' opportunity.event.pk %}">{{ opportunity.event.name }}</a>
+                    {% else %}
+                        —
+                    {% endif %}
+                </span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Source</span>
+                <span class="detail-value">{{ opportunity.get_source_display|default:"—" }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Follow Up</span>
+                <span class="detail-value">{{ opportunity.follow_up_date|date:"M d, Y"|default:"—" }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Created</span>
+                <span class="detail-value">{{ opportunity.created_at|date:"M d, Y" }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Last Updated</span>
+                <span class="detail-value">{{ opportunity.updated_at|date:"M d, Y" }}</span>
+            </div>
+            {% if opportunity.tags.all %}
+            <div class="detail-row">
+                <span class="detail-label">Tags</span>
+                <span class="detail-value">
+                    {% for tag in opportunity.tags.all %}
+                        <span class="badge badge-blue">{{ tag.name }}</span>
+                    {% endfor %}
+                </span>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Booth Details -->
+        {% if opportunity.booth_size or opportunity.booth_number or opportunity.booth_location %}
+        <div class="card mb-2">
+            <div class="card-title">Booth Details</div>
+            <div class="detail-row">
+                <span class="detail-label">Booth Size</span>
+                <span class="detail-value">{{ opportunity.get_booth_size_display|default:"—" }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Booth Number</span>
+                <span class="detail-value">{{ opportunity.booth_number|default:"—" }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Booth Location</span>
+                <span class="detail-value">{{ opportunity.booth_location|default:"—" }}</span>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if opportunity.notes %}
+        <div class="card mb-2">
+            <div class="card-title">Notes</div>
+            <p>{{ opportunity.notes }}</p>
+        </div>
+        {% endif %}
+
+        {% if opportunity.outreach_history %}
+        <div class="card mb-2">
+            <div class="card-title">Outreach History</div>
+            <p>{{ opportunity.outreach_history }}</p>
+        </div>
+        {% endif %}
+
+    </div>
+
+    <!-- Right Column — Activity Log -->
+    <div>
+        <div class="card">
+            <div class="card-title">Activity Log</div>
+            {% if activity_logs %}
+                <div class="timeline">
+                    {% for log in activity_logs %}
+                    <div class="timeline-item">
+                        <div class="timeline-date">
+                            {{ log.created_at|date:"M d, Y H:i" }} &mdash;
+                            {{ log.performed_by.get_full_name|default:log.performed_by.username|default:"System" }}
+                        </div>
+                        <div class="timeline-text">
+                            <span class="badge badge-gray">{{ log.get_action_display }}</span>
+                            {{ log.description }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No activity yet.</p>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

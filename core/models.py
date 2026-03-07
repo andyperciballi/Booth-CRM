@@ -108,92 +108,6 @@ class Contact(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
-class Opportunity(models.Model):
-
-    STAGE_CHOICES = [
-        ('prospecting', 'Prospecting'),
-        ('interest_shown', 'Interest Shown'),
-        ('meeting_booked', 'Meeting Booked'),
-        ('qualified', 'Qualified'),
-        ('proposal', 'Proposal'),
-        ('negotiating', 'Negotiating'),
-        ('closed_won', 'Closed Won'),
-        ('closed_lost', 'Closed Lost'),
-    ]
-
-    SOURCE_CHOICES = [
-        ('inbound_cold', 'Inbound Cold'),
-        ('inbound_warm', 'Inbound Warm'),
-        ('outbound', 'Outbound'),
-        ('referral', 'Referral'),
-        ('event', 'Event'),
-        ('other', 'Other'),
-    ]
-    BOOTH_SIZE_CHOICES = [
-        ('none', 'No Booth'),
-        ('table_top', 'Table Top'),
-        ('10x10', '10x10'),
-        ('10x20', '10x20'),
-        ('20x20', '20x20'),
-        ('20x30', '20x30'),
-        ('20x40', '20x40'),
-        ('custom', 'Custom'),
-    ]
-    FORECAST_CHOICES = [
-        ('in_forecast', 'In Forecast'),
-        ('out_of_forecast', 'Out of Forecast'),
-        ('stretch', 'Stretch'),
-        ('unlikely', 'Unlikely'),
-    ]
-
-    OPPORTUNITY_TYPE_CHOICES = [
-        ('vendor', 'Vendor'),
-        ('food_vendor', 'Food Vendor'),
-        ('guest_appearance', 'Guest Appearance'),
-        ('panel', 'Panel'),
-        ('photo_op', 'Photo Op'),
-        ('signing', 'Signing'),
-        ('activity_room', 'Activity Room'),
-        ('custom_room', 'Custom Room'),
-        ('sponsor', 'Sponsor'),
-        ('other', 'Other'),
-    ]
-
-    opportunity_type  = models.CharField(max_length=50, choices=OPPORTUNITY_TYPE_CHOICES, blank=True, null=True)
-    forecast_category = models.CharField(max_length=50, choices=FORECAST_CHOICES, blank=True, null=True)
-    # Identity
-    name             = models.CharField(max_length=255)
-    description      = models.TextField(blank=True, null=True)
-
-    # Relationships
-    # contact is required, account is optional
-    contact          = models.ForeignKey(Contact, on_delete=models.PROTECT, related_name='opportunities')
-    account          = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True, blank=True, related_name='opportunities')
-    owner            = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='opportunities')
-
-    # CRM
-    stage            = models.CharField(max_length=50, choices=STAGE_CHOICES, default='prospecting')
-    arr              = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
-    close_date       = models.DateField(blank=True, null=True)
-    source           = models.CharField(max_length=50, choices=SOURCE_CHOICES, blank=True, null=True)
-    follow_up_date   = models.DateField(blank=True, null=True)
-    notes            = models.TextField(blank=True, null=True)
-    outreach_history = models.TextField(blank=True, null=True)
-    tags             = models.ManyToManyField('Tag', blank=True)
-    booth_size       = models.CharField(max_length=50, choices=BOOTH_SIZE_CHOICES, blank=True, null=True)
-    booth_number     = models.CharField(max_length=50, blank=True, null=True)
-    booth_location   = models.CharField(max_length=255, blank=True, null=True)
-
-    event            = models.ForeignKey('Event', on_delete=models.SET_NULL, null=True, blank=True, related_name='opportunities')
-
-    # Timestamps
-    created_at       = models.DateTimeField(auto_now_add=True)
-    updated_at       = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.name
-    
-
 class Event(models.Model):
 
     STATUS_CHOICES = [
@@ -227,8 +141,7 @@ class Event(models.Model):
     activity_room_capacity  = models.IntegerField(blank=True, null=True)
     signing_capacity        = models.IntegerField(blank=True, null=True)
 
-    # Flexible overflow for anything that doesnt fit above
-    # e.g "D&D room", "Draw with the Pros", "Kids Zone"
+    # Custom rooms
     custom_room_1_name      = models.CharField(max_length=100, blank=True, null=True)
     custom_room_1_capacity  = models.IntegerField(blank=True, null=True)
     custom_room_2_name      = models.CharField(max_length=100, blank=True, null=True)
@@ -247,3 +160,121 @@ class Event(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Opportunity(models.Model):
+
+    STAGE_CHOICES = [
+        ('prospecting', 'Prospecting'),
+        ('interest_shown', 'Interest Shown'),
+        ('meeting_booked', 'Meeting Booked'),
+        ('qualified', 'Qualified'),
+        ('proposal', 'Proposal'),
+        ('negotiating', 'Negotiating'),
+        ('closed_won', 'Closed Won'),
+        ('closed_lost', 'Closed Lost'),
+    ]
+
+    SOURCE_CHOICES = [
+        ('inbound_cold', 'Inbound Cold'),
+        ('inbound_warm', 'Inbound Warm'),
+        ('outbound', 'Outbound'),
+        ('referral', 'Referral'),
+        ('event', 'Event'),
+        ('other', 'Other'),
+    ]
+
+    BOOTH_SIZE_CHOICES = [
+        ('none', 'No Booth'),
+        ('table_top', 'Table Top'),
+        ('10x10', '10x10'),
+        ('10x20', '10x20'),
+        ('20x20', '20x20'),
+        ('20x30', '20x30'),
+        ('20x40', '20x40'),
+        ('custom', 'Custom'),
+    ]
+
+    FORECAST_CHOICES = [
+        ('in_forecast', 'In Forecast'),
+        ('out_of_forecast', 'Out of Forecast'),
+        ('stretch', 'Stretch'),
+        ('unlikely', 'Unlikely'),
+    ]
+
+    OPPORTUNITY_TYPE_CHOICES = [
+        ('vendor', 'Vendor'),
+        ('food_vendor', 'Food Vendor'),
+        ('guest_appearance', 'Guest Appearance'),
+        ('panel', 'Panel'),
+        ('photo_op', 'Photo Op'),
+        ('signing', 'Signing'),
+        ('activity_room', 'Activity Room'),
+        ('custom_room', 'Custom Room'),
+        ('sponsor', 'Sponsor'),
+        ('other', 'Other'),
+    ]
+
+    # Identity
+    name              = models.CharField(max_length=255)
+    description       = models.TextField(blank=True, null=True)
+
+    # Relationships
+    contact           = models.ForeignKey(Contact, on_delete=models.PROTECT, related_name='opportunities')
+    account           = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True, blank=True, related_name='opportunities')
+    owner             = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='opportunities')
+    event             = models.ForeignKey(Event, on_delete=models.SET_NULL, null=True, blank=True, related_name='opportunities')
+
+    # CRM
+    stage             = models.CharField(max_length=50, choices=STAGE_CHOICES, default='prospecting')
+    forecast_category = models.CharField(max_length=50, choices=FORECAST_CHOICES, blank=True, null=True)
+    opportunity_type  = models.CharField(max_length=50, choices=OPPORTUNITY_TYPE_CHOICES, blank=True, null=True)
+    arr               = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
+    close_date        = models.DateField(blank=True, null=True)
+    source            = models.CharField(max_length=50, choices=SOURCE_CHOICES, blank=True, null=True)
+    follow_up_date    = models.DateField(blank=True, null=True)
+    notes             = models.TextField(blank=True, null=True)
+    outreach_history  = models.TextField(blank=True, null=True)
+    tags              = models.ManyToManyField('Tag', blank=True)
+    booth_size        = models.CharField(max_length=50, choices=BOOTH_SIZE_CHOICES, blank=True, null=True)
+    booth_number      = models.CharField(max_length=50, blank=True, null=True)
+    booth_location    = models.CharField(max_length=255, blank=True, null=True)
+
+    # Timestamps
+    created_at        = models.DateTimeField(auto_now_add=True)
+    updated_at        = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = 'Opportunities'
+
+    def __str__(self):
+        return self.name
+
+
+class ActivityLog(models.Model):
+
+    ACTION_CHOICES = [
+        ('created', 'Created'),
+        ('updated', 'Updated'),
+        ('stage_changed', 'Stage Changed'),
+        ('note_added', 'Note Added'),
+        ('follow_up_set', 'Follow Up Set'),
+    ]
+
+    # Tied to a specific record — only one will be set at a time
+    account      = models.ForeignKey(Account, on_delete=models.CASCADE, null=True, blank=True, related_name='activity_logs')
+    contact      = models.ForeignKey(Contact, on_delete=models.CASCADE, null=True, blank=True, related_name='activity_logs')
+    opportunity  = models.ForeignKey(Opportunity, on_delete=models.CASCADE, null=True, blank=True, related_name='activity_logs')
+    event        = models.ForeignKey(Event, on_delete=models.CASCADE, null=True, blank=True, related_name='activity_logs')
+
+    # Who did what and when
+    action       = models.CharField(max_length=50, choices=ACTION_CHOICES)
+    description  = models.TextField()
+    performed_by = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='activity_logs')
+    created_at   = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.action} by {self.performed_by} — {self.created_at:%Y-%m-%d %H:%M}"

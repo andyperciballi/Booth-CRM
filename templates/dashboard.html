@@ -3,6 +3,243 @@
 {% block title %}Dashboard — BoothCRM{% endblock %}
 
 {% block content %}
-<h1>Dashboard</h1>
-<p>Welcome, {{ request.user.username }}</p>
+
+<div class="page-header">
+    <div class="page-title-block">
+        <h1>Dashboard</h1>
+        <div class="page-subtitle">
+            {% if role == 'admin' or role == 'manager' %}
+            Manager View
+            {% else %}
+            Welcome back, {{ request.user.get_full_name|default:request.user.username }}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if role == 'admin' or role == 'manager' %}
+
+<!-- ===== MANAGER DASHBOARD ===== -->
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-label">Open Pipeline</div>
+        <div class="kpi-value">${{ open_opps_value|floatformat:0 }}</div>
+        <div class="kpi-sub">{{ open_opps_count }} opportunities</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Forecasted ARR (90 days)</div>
+        <div class="kpi-value">${{ forecast_arr|floatformat:0 }}</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Overdue Follow Ups</div>
+        <div class="kpi-value">{{ overdue_followups.count }}</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Upcoming Events</div>
+        <div class="kpi-value">{{ upcoming_events.count }}</div>
+    </div>
+</div>
+
+<div class="grid-2 mt-2">
+
+    <!-- Pipeline by Rep -->
+    <div class="card">
+        <div class="card-title">Pipeline by Rep</div>
+        {% if pipeline_by_rep %}
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rep</th>
+                        <th>Open Opps</th>
+                        <th>Pipeline Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rep in pipeline_by_rep %}
+                    <tr>
+                        <td>{{ rep.name }}</td>
+                        <td>{{ rep.count }}</td>
+                        <td>${{ rep.total|floatformat:0 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No open pipeline data.</p>
+        {% endif %}
+    </div>
+
+    <!-- Upcoming Events -->
+    <div class="card">
+        <div class="card-title">Upcoming Events</div>
+        {% if upcoming_events %}
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Event</th>
+                        <th>Status</th>
+                        <th>Start Date</th>
+                        <th>Manager</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in upcoming_events %}
+                    <tr>
+                        <td class="link-cell">
+                            <a href="{% url 'event_detail' event.pk %}">{{ event.name }}</a>
+                        </td>
+                        <td>
+                            {% if event.status == 'open' %}
+                                <span class="badge badge-green">{{ event.get_status_display }}</span>
+                            {% elif event.status == 'planning' %}
+                                <span class="badge badge-yellow">{{ event.get_status_display }}</span>
+                            {% else %}
+                                <span class="badge badge-gray">{{ event.get_status_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ event.start_date|date:"M d, Y"|default:"—" }}</td>
+                        <td>{{ event.event_manager.get_full_name|default:event.event_manager.username|default:"—" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No upcoming events.</p>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- Overdue Follow Ups -->
+<div class="card mt-2">
+    <div class="card-title">Overdue Follow Ups</div>
+    {% if overdue_followups %}
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Contact</th>
+                    <th>Account</th>
+                    <th>Owner</th>
+                    <th>Follow Up Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for contact in overdue_followups %}
+                <tr>
+                    <td class="link-cell">
+                        <a href="{% url 'contact_detail' contact.pk %}">
+                            {{ contact.first_name }} {{ contact.last_name }}
+                        </a>
+                    </td>
+                    <td>{{ contact.account.name|default:"—" }}</td>
+                    <td>{{ contact.contact_owner.get_full_name|default:contact.contact_owner.username|default:"—" }}</td>
+                    <td><span class="badge badge-red">{{ contact.follow_up_date|date:"M d, Y" }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p>No overdue follow ups.</p>
+    {% endif %}
+</div>
+
+{% else %}
+
+<!-- ===== REP DASHBOARD ===== -->
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-label">My Open Pipeline</div>
+        <div class="kpi-value">${{ my_open_value|floatformat:0 }}</div>
+        <div class="kpi-sub">{{ my_open_count }} opportunities</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Forecasted ARR (90 days)</div>
+        <div class="kpi-value">${{ my_forecast|floatformat:0 }}</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Closed Won</div>
+        <div class="kpi-value">${{ my_closed_won|floatformat:0 }}</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Overdue Follow Ups</div>
+        <div class="kpi-value">{{ my_followups.count }}</div>
+    </div>
+</div>
+
+<div class="grid-2 mt-2">
+
+    <!-- Pipeline by Stage -->
+    <div class="card">
+        <div class="card-title">My Pipeline by Stage</div>
+        {% if pipeline_by_stage %}
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Stage</th>
+                        <th>Count</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in pipeline_by_stage %}
+                    {% if row.count > 0 %}
+                    <tr>
+                        <td>{{ row.stage }}</td>
+                        <td>{{ row.count }}</td>
+                        <td>${{ row.total|floatformat:0 }}</td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No open opportunities.</p>
+        {% endif %}
+    </div>
+
+    <!-- Overdue Follow Ups -->
+    <div class="card">
+        <div class="card-title">My Overdue Follow Ups</div>
+        {% if my_followups %}
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Contact</th>
+                        <th>Account</th>
+                        <th>Follow Up Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contact in my_followups %}
+                    <tr>
+                        <td class="link-cell">
+                            <a href="{% url 'contact_detail' contact.pk %}">
+                                {{ contact.first_name }} {{ contact.last_name }}
+                            </a>
+                        </td>
+                        <td>{{ contact.account.name|default:"—" }}</td>
+                        <td><span class="badge badge-red">{{ contact.follow_up_date|date:"M d, Y" }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No overdue follow ups.</p>
+        {% endif %}
+    </div>
+
+</div>
+
+{% endif %}
+
 {% endblock %}

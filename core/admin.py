@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Tag, Account, Contact, Opportunity, Event
+from .models import Tag, Account, Contact, Opportunity, Event, ActivityLog
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
@@ -37,3 +37,9 @@ class EventAdmin(admin.ModelAdmin):
     list_filter = ('status',)
     search_fields = ('name', 'location')
     ordering = ('-start_date',)
+
+
+@admin.register(ActivityLog)
+class ActivityLogAdmin(admin.ModelAdmin):
+    list_display = ('action', 'description', 'performed_by', 'created_at')
+    list_filter = ('action',)

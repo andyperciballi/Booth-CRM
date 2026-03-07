@@ -3,5 +3,150 @@
 {% block title %}Opportunities — BoothCRM{% endblock %}
 
 {% block content %}
-<h1>Opportunities</h1>
+
+<div class="page-header">
+    <div class="page-title-block">
+        <h1>Opportunities</h1>
+        <div class="page-subtitle">{{ opportunities.count }} total opportunities</div>
+    </div>
+    {% if request.user.is_authenticated %}
+        <a href="{% url 'opportunity_create' %}" class="btn btn-primary">+ New Opportunity</a>
+    {% endif %}
+</div>
+
+<form method="GET" class="search-filter-bar">
+    <input
+        type="text"
+        name="q"
+        value="{{ query }}"
+        placeholder="Search by name, account, contact...">
+
+    <select name="stage">
+        <option value="">All Stages</option>
+        {% for value, label in stage_choices %}
+            <option value="{{ value }}" {% if selected_stage == value %}selected{% endif %}>
+                {{ label }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <select name="forecast">
+        <option value="">All Forecasts</option>
+        {% for value, label in forecast_choices %}
+            <option value="{{ value }}" {% if selected_forecast == value %}selected{% endif %}>
+                {{ label }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <select name="type">
+        <option value="">All Types</option>
+        {% for value, label in type_choices %}
+            <option value="{{ value }}" {% if selected_type == value %}selected{% endif %}>
+                {{ label }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <select name="event">
+        <option value="">All Events</option>
+        {% for event in events %}
+            <option value="{{ event.id }}" {% if selected_event == event.id|stringformat:"s" %}selected{% endif %}>
+                {{ event.name }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <select name="owner">
+        <option value="">All Owners</option>
+        {% for user in owners %}
+            <option value="{{ user.id }}" {% if selected_owner == user.id|stringformat:"s" %}selected{% endif %}>
+                {{ user.get_full_name|default:user.username }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <button type="submit" class="btn btn-ghost">Search</button>
+    <a href="{% url 'opportunities_list' %}" class="btn btn-ghost">Clear</a>
+</form>
+
+<div class="table-wrapper">
+    <table>
+        <thead>
+            <tr>
+                <th>Opportunity</th>
+                <th>Account</th>
+                <th>Contact</th>
+                <th>Event</th>
+                <th>Stage</th>
+                <th>Forecast</th>
+                <th>Type</th>
+                <th>ARR</th>
+                <th>Close Date</th>
+                <th>Owner</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for opp in opportunities %}
+            <tr>
+                <td class="link-cell">
+                    <a href="{% url 'opportunity_detail' opp.pk %}">{{ opp.name }}</a>
+                </td>
+                <td>
+                    {% if opp.account %}
+                        <a href="{% url 'account_detail' opp.account.pk %}">{{ opp.account.name }}</a>
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
+                <td>{{ opp.contact.first_name }} {{ opp.contact.last_name }}</td>
+                <td>{{ opp.event.name|default:"—" }}</td>
+                <td>
+                    {% if opp.stage == 'closed_won' %}
+                        <span class="badge badge-green">{{ opp.get_stage_display }}</span>
+                    {% elif opp.stage == 'closed_lost' %}
+                        <span class="badge badge-red">{{ opp.get_stage_display }}</span>
+                    {% elif opp.stage == 'negotiating' %}
+                        <span class="badge badge-yellow">{{ opp.get_stage_display }}</span>
+                    {% elif opp.stage == 'prospecting' %}
+                        <span class="badge badge-purple">{{ opp.get_stage_display }}</span>
+                    {% else %}
+                        <span class="badge badge-blue">{{ opp.get_stage_display }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if opp.forecast_category %}
+                        {% if opp.forecast_category == 'in_forecast' %}
+                            <span class="badge badge-green">{{ opp.get_forecast_category_display }}</span>
+                        {% elif opp.forecast_category == 'unlikely' %}
+                            <span class="badge badge-red">{{ opp.get_forecast_category_display }}</span>
+                        {% elif opp.forecast_category == 'stretch' %}
+                            <span class="badge badge-yellow">{{ opp.get_forecast_category_display }}</span>
+                        {% else %}
+                            <span class="badge badge-gray">{{ opp.get_forecast_category_display }}</span>
+                        {% endif %}
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
+                <td>{{ opp.get_opportunity_type_display|default:"—" }}</td>
+                <td>
+                    {% if opp.arr %}
+                        ${{ opp.arr|floatformat:0 }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
+                <td>{{ opp.close_date|date:"M d, Y"|default:"—" }}</td>
+                <td>{{ opp.owner.get_full_name|default:opp.owner.username|default:"Unassigned" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="10" class="empty-table">No opportunities found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
 {% endblock %}

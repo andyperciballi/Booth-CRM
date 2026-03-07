@@ -3,5 +3,102 @@
 {% block title %}Contacts — BoothCRM{% endblock %}
 
 {% block content %}
-<h1>Contacts</h1>
+
+<div class="page-header">
+    <div class="page-title-block">
+        <h1>Contacts</h1>
+        <div class="page-subtitle">{{ contacts.count }} total contacts</div>
+    </div>
+    {% if request.user.is_authenticated %}
+        <a href="{% url 'contact_create' %}" class="btn btn-primary">+ New Contact</a>
+    {% endif %}
+</div>
+
+<form method="GET" class="search-filter-bar">
+    <input
+        type="text"
+        name="q"
+        value="{{ query }}"
+        placeholder="Search by name, email, title, account...">
+
+    <select name="status">
+        <option value="">All Statuses</option>
+        {% for value, label in status_choices %}
+            <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>
+                {{ label }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <select name="owner">
+        <option value="">All Owners</option>
+        {% for user in owners %}
+            <option value="{{ user.id }}" {% if selected_owner == user.id|stringformat:"s" %}selected{% endif %}>
+                {{ user.get_full_name|default:user.username }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <button type="submit" class="btn btn-ghost">Search</button>
+    <a href="{% url 'contacts_list' %}" class="btn btn-ghost">Clear</a>
+</form>
+
+<div class="table-wrapper">
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Title</th>
+                <th>Account</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Status</th>
+                <th>Follow Up</th>
+                <th>Owner</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for contact in contacts %}
+            <tr>
+                <td class="link-cell">
+                    <a href="{% url 'contact_detail' contact.pk %}">{{ contact.first_name }} {{ contact.last_name }}</a>
+                    {% if contact.is_primary %}
+                        <span class="badge badge-blue">Primary</span>
+                    {% endif %}
+                </td>
+                <td>{{ contact.title|default:"—" }}</td>
+                <td>
+                    {% if contact.account %}
+                        <a href="{% url 'account_detail' contact.account.pk %}">{{ contact.account.name }}</a>
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
+                <td>{{ contact.email|default:"—" }}</td>
+                <td>{{ contact.mobile_phone|default:contact.work_phone|default:"—" }}</td>
+                <td>
+                    {% if contact.status == 'active' %}
+                        <span class="badge badge-green">Active</span>
+                    {% else %}
+                        <span class="badge badge-gray">Inactive</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if contact.follow_up_date %}
+                        {{ contact.follow_up_date|date:"M d, Y" }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
+                <td>{{ contact.contact_owner.get_full_name|default:contact.contact_owner.username|default:"Unassigned" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="empty-table">No contacts found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
 {% endblock %}

@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block title %}New Opportunity — BoothCRM{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div class="page-title-block">
+        <h1>New Opportunity</h1>
+        <div class="page-subtitle">Create a new opportunity</div>
+    </div>
+    <div class="page-actions">
+        <a href="{% url 'opportunities_list' %}" class="btn btn-ghost">← Cancel</a>
+    </div>
+</div>
+
+<form method="POST">
+    {% csrf_token %}
+    <div class="grid-sidebar">
+
+        <div>
+            <div class="card mb-2">
+                <div class="card-title">Identity</div>
+                <div class="form-group">
+                    <label>Opportunity Name *</label>
+                    <input type="text" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Contact *</label>
+                    <select name="contact" required>
+                        <option value="">— Select Contact —</option>
+                        {% for contact in contacts %}
+                            <option value="{{ contact.id }}">
+                                {{ contact.first_name }} {{ contact.last_name }}
+                                {% if contact.account %} — {{ contact.account.name }}{% endif %}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Account</label>
+                    <select name="account">
+                        <option value="">— No Account —</option>
+                        {% for account in accounts %}
+                            <option value="{{ account.id }}">{{ account.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Event</label>
+                    <select name="event">
+                        <option value="">— No Event —</option>
+                        {% for event in events %}
+                            <option value="{{ event.id }}">{{ event.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Owner</label>
+                    <select name="owner">
+                        <option value="">— Unassigned —</option>
+                        {% for user in users %}
+                            <option value="{{ user.id }}">{{ user.get_full_name|default:user.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Source</label>
+                    <select name="source">
+                        <option value="">— Select Source —</option>
+                        {% for value, label in source_choices %}
+                            <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="card mb-2">
+                <div class="card-title">Booth Details</div>
+                <div class="form-group">
+                    <label>Booth Size</label>
+                    <select name="booth_size">
+                        <option value="">— Select Size —</option>
+                        {% for value, label in booth_size_choices %}
+                            <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Booth Number</label>
+                    <input type="text" name="booth_number">
+                </div>
+                <div class="form-group">
+                    <label>Booth Location</label>
+                    <input type="text" name="booth_location">
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="card mb-2">
+                <div class="card-title">CRM</div>
+                <div class="form-group">
+                    <label>Stage</label>
+                    <select name="stage">
+                        {% for value, label in stage_choices %}
+                            <option value="{{ value }}" {% if value == 'prospecting' %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Forecast Category</label>
+                    <select name="forecast_category">
+                        <option value="">— Select Forecast —</option>
+                        {% for value, label in forecast_choices %}
+                            <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Opportunity Type</label>
+                    <select name="opportunity_type">
+                        <option value="">— Select Type —</option>
+                        {% for value, label in type_choices %}
+                            <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>ARR</label>
+                    <input type="number" name="arr" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Close Date</label>
+                    <input type="date" name="close_date">
+                </div>
+                <div class="form-group">
+                    <label>Follow Up Date</label>
+                    <input type="date" name="follow_up_date">
+                </div>
+            </div>
+
+            <div class="card mb-2">
+                <div class="card-title">Notes & Outreach</div>
+                <div class="form-group">
+                    <label>Notes</label>
+                    <textarea name="notes" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Outreach History</label>
+                    <textarea name="outreach_history" rows="6"></textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Create Opportunity</button>
+        </div>
+
+    </div>
+</form>
+
+{% endblock %}

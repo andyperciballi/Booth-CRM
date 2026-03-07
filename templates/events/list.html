@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Events — BoothCRM{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div class="page-title-block">
+        <h1>Events</h1>
+        <div class="page-subtitle">{{ events.count }} total events</div>
+    </div>
+    {% if request.user.is_authenticated %}
+        <a href="{% url 'event_create' %}" class="btn btn-primary">+ New Event</a>
+    {% endif %}
+</div>
+
+<form method="GET" class="search-filter-bar">
+    <input
+        type="text"
+        name="q"
+        value="{{ query }}"
+        placeholder="Search by name or location...">
+
+    <select name="status">
+        <option value="">All Statuses</option>
+        {% for value, label in status_choices %}
+            <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>
+                {{ label }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <button type="submit" class="btn btn-ghost">Search</button>
+    <a href="{% url 'events_list' %}" class="btn btn-ghost">Clear</a>
+</form>
+
+<div class="table-wrapper">
+    <table>
+        <thead>
+            <tr>
+                <th>Event Name</th>
+                <th>Status</th>
+                <th>Location</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Vendor Cap</th>
+                <th>Guest Cap</th>
+                <th>Manager</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for event in events %}
+            <tr>
+                <td class="link-cell">
+                    <a href="{% url 'event_detail' event.pk %}">{{ event.name }}</a>
+                </td>
+                <td>
+                    {% if event.status == 'open' %}
+                        <span class="badge badge-green">{{ event.get_status_display }}</span>
+                    {% elif event.status == 'planning' %}
+                        <span class="badge badge-yellow">{{ event.get_status_display }}</span>
+                    {% elif event.status == 'cancelled' %}
+                        <span class="badge badge-red">{{ event.get_status_display }}</span>
+                    {% else %}
+                        <span class="badge badge-gray">{{ event.get_status_display }}</span>
+                    {% endif %}
+                </td>
+                <td>{{ event.location|default:"—" }}</td>
+                <td>{{ event.start_date|date:"M d, Y"|default:"—" }}</td>
+                <td>{{ event.end_date|date:"M d, Y"|default:"—" }}</td>
+                <td>{{ event.vendor_capacity|default:"—" }}</td>
+                <td>{{ event.guest_capacity|default:"—" }}</td>
+                <td>{{ event.event_manager.get_full_name|default:event.event_manager.username|default:"Unassigned" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="empty-table">No events found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

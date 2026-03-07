@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit {{ event.name }} — BoothCRM{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div class="page-title-block">
+        <h1>Edit Event</h1>
+        <div class="page-subtitle">{{ event.name }}</div>
+    </div>
+    <div class="page-actions">
+        <a href="{% url 'event_detail' event.pk %}" class="btn btn-ghost">← Cancel</a>
+    </div>
+</div>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <div class="grid-sidebar">
+
+        <!-- Left Column -->
+        <div>
+            <div class="card mb-2">
+                <div class="card-title">Identity</div>
+                <div class="form-group">
+                    <label>Event Name *</label>
+                    <input type="text" name="name" value="{{ event.name }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description">{{ event.description|default:"" }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" name="location" value="{{ event.location|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <input type="date" name="start_date" value="{{ event.start_date|date:'Y-m-d'|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>End Date</label>
+                    <input type="date" name="end_date" value="{{ event.end_date|date:'Y-m-d'|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        {% for value, label in status_choices %}
+                            <option value="{{ value }}" {% if event.status == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Event Manager</label>
+                    <select name="event_manager">
+                        <option value="">— Unassigned —</option>
+                        {% for user in users %}
+                            <option value="{{ user.id }}" {% if event.event_manager.id == user.id %}selected{% endif %}>
+                                {{ user.get_full_name|default:user.username }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div>
+            <div class="card mb-2">
+                <div class="card-title">Capacity</div>
+                <div class="form-group">
+                    <label>Total Attendance Cap</label>
+                    <input type="number" name="total_attendance_cap" value="{{ event.total_attendance_cap|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Vendor Capacity</label>
+                    <input type="number" name="vendor_capacity" value="{{ event.vendor_capacity|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Food Vendor Capacity</label>
+                    <input type="number" name="food_vendor_capacity" value="{{ event.food_vendor_capacity|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Guest Capacity</label>
+                    <input type="number" name="guest_capacity" value="{{ event.guest_capacity|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Panel Room Capacity</label>
+                    <input type="number" name="panel_room_capacity" value="{{ event.panel_room_capacity|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Photo Op Capacity</label>
+                    <input type="number" name="photo_op_capacity" value="{{ event.photo_op_capacity|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Signing Capacity</label>
+                    <input type="number" name="signing_capacity" value="{{ event.signing_capacity|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Activity Room Capacity</label>
+                    <input type="number" name="activity_room_capacity" value="{{ event.activity_room_capacity|default:'' }}">
+                </div>
+            </div>
+
+            <div class="card mb-2">
+                <div class="card-title">Custom Rooms</div>
+                <div class="form-group">
+                    <label>Custom Room 1 Name</label>
+                    <input type="text" name="custom_room_1_name" value="{{ event.custom_room_1_name|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Custom Room 1 Capacity</label>
+                    <input type="number" name="custom_room_1_capacity" value="{{ event.custom_room_1_capacity|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Custom Room 2 Name</label>
+                    <input type="text" name="custom_room_2_name" value="{{ event.custom_room_2_name|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Custom Room 2 Capacity</label>
+                    <input type="number" name="custom_room_2_capacity" value="{{ event.custom_room_2_capacity|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Custom Room 3 Name</label>
+                    <input type="text" name="custom_room_3_name" value="{{ event.custom_room_3_name|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Custom Room 3 Capacity</label>
+                    <input type="number" name="custom_room_3_capacity" value="{{ event.custom_room_3_capacity|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Custom Room 4 Name</label>
+                    <input type="text" name="custom_room_4_name" value="{{ event.custom_room_4_name|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Custom Room 4 Capacity</label>
+                    <input type="number" name="custom_room_4_capacity" value="{{ event.custom_room_4_capacity|default:'' }}">
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+
+    </div>
+</form>
+
+{% endblock %}

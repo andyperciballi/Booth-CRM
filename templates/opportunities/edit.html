@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit {{ opportunity.name }} — BoothCRM{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div class="page-title-block">
+        <h1>Edit Opportunity</h1>
+        <div class="page-subtitle">{{ opportunity.name }}</div>
+    </div>
+    <div class="page-actions">
+        <a href="{% url 'opportunity_detail' opportunity.pk %}" class="btn btn-ghost">← Cancel</a>
+    </div>
+</div>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <div class="grid-sidebar">
+
+        <!-- Left Column -->
+        <div>
+            <div class="card mb-2">
+                <div class="card-title">Identity</div>
+                <div class="form-group">
+                    <label>Opportunity Name *</label>
+                    <input type="text" name="name" value="{{ opportunity.name }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description">{{ opportunity.description|default:"" }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Contact *</label>
+                    <select name="contact" required>
+                        <option value="">— Select Contact —</option>
+                        {% for contact in contacts %}
+                            <option value="{{ contact.id }}" {% if opportunity.contact.id == contact.id %}selected{% endif %}>
+                                {{ contact.first_name }} {{ contact.last_name }}
+                                {% if contact.account %} — {{ contact.account.name }}{% endif %}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Account</label>
+                    <select name="account">
+                        <option value="">— No Account —</option>
+                        {% for account in accounts %}
+                            <option value="{{ account.id }}" {% if opportunity.account.id == account.id %}selected{% endif %}>
+                                {{ account.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Event</label>
+                    <select name="event">
+                        <option value="">— No Event —</option>
+                        {% for event in events %}
+                            <option value="{{ event.id }}" {% if opportunity.event.id == event.id %}selected{% endif %}>
+                                {{ event.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Owner</label>
+                    <select name="owner">
+                        <option value="">— Unassigned —</option>
+                        {% for user in users %}
+                            <option value="{{ user.id }}" {% if opportunity.owner.id == user.id %}selected{% endif %}>
+                                {{ user.get_full_name|default:user.username }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Source</label>
+                    <select name="source">
+                        <option value="">— Select Source —</option>
+                        {% for value, label in source_choices %}
+                            <option value="{{ value }}" {% if opportunity.source == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="card mb-2">
+                <div class="card-title">Booth Details</div>
+                <div class="form-group">
+                    <label>Booth Size</label>
+                    <select name="booth_size">
+                        <option value="">— Select Size —</option>
+                        {% for value, label in booth_size_choices %}
+                            <option value="{{ value }}" {% if opportunity.booth_size == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Booth Number</label>
+                    <input type="text" name="booth_number" value="{{ opportunity.booth_number|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Booth Location</label>
+                    <input type="text" name="booth_location" value="{{ opportunity.booth_location|default:'' }}">
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div>
+            <div class="card mb-2">
+                <div class="card-title">CRM</div>
+                <div class="form-group">
+                    <label>Stage</label>
+                    <select name="stage">
+                        {% for value, label in stage_choices %}
+                            <option value="{{ value }}" {% if opportunity.stage == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Forecast Category</label>
+                    <select name="forecast_category">
+                        <option value="">— Select Forecast —</option>
+                        {% for value, label in forecast_choices %}
+                            <option value="{{ value }}" {% if opportunity.forecast_category == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Opportunity Type</label>
+                    <select name="opportunity_type">
+                        <option value="">— Select Type —</option>
+                        {% for value, label in type_choices %}
+                            <option value="{{ value }}" {% if opportunity.opportunity_type == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>ARR</label>
+                    <input type="number" name="arr" value="{{ opportunity.arr|default:'' }}" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Close Date</label>
+                    <input type="date" name="close_date" value="{{ opportunity.close_date|date:'Y-m-d'|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Follow Up Date</label>
+                    <input type="date" name="follow_up_date" value="{{ opportunity.follow_up_date|date:'Y-m-d'|default:'' }}">
+                </div>
+            </div>
+
+            <div class="card mb-2">
+                <div class="card-title">Notes & Outreach</div>
+                <div class="form-group">
+                    <label>Notes</label>
+                    <textarea name="notes" rows="4">{{ opportunity.notes|default:"" }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Outreach History</label>
+                    <textarea name="outreach_history" rows="6">{{ opportunity.outreach_history|default:"" }}</textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+
+    </div>
+</form>
+
+{% endblock %}

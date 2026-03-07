@@ -296,6 +296,21 @@ a:hover {
     transition: all 0.15s;
     text-decoration: none;
     letter-spacing: 0.5px;
+    font-family: inherit;
+    -webkit-appearance: none;
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    text-decoration: none;
+    letter-spacing: 0.5px;
 }
 
 .btn-primary {
@@ -351,6 +366,73 @@ a:hover {
 .badge-blue   { background: var(--badge-blue-bg);   color: var(--blue); }
 .badge-purple { background: var(--badge-purple-bg); color: var(--purple); }
 .badge-gray   { background: var(--badge-gray-bg);   color: var(--text-muted); }
+
+/* ===========================
+   AUTH / LOGIN
+   =========================== */
+.login-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-box {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 40px;
+    width: 100%;
+    max-width: 420px;
+}
+
+.login-logo {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.login-subtitle {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+    letter-spacing: 1px;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 12px;
+    background: var(--accent);
+    color: var(--accent-text);
+    border: none;
+    border-radius: 5px;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.15s;
+}
+
+.login-btn:hover {
+    background: var(--accent-hover);
+}
+
+.error-msg {
+    background: var(--badge-red-bg);
+    color: var(--red);
+    border: 1px solid var(--red);
+    border-radius: 5px;
+    padding: 10px 14px;
+    font-size: 12px;
+    margin-bottom: 16px;
+}
 
 /* ===========================
    TABLES
@@ -551,3 +633,74 @@ hr {
 ::-webkit-scrollbar-track { background: var(--bg-page); }
 ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
+
+/* ===========================
+   SEARCH / FILTER BAR
+   =========================== */
+.search-filter-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.search-filter-bar input[type="text"] {
+    flex: 1;
+    min-width: 200px;
+}
+
+.search-filter-bar select {
+    width: auto;
+}
+
+/* ===========================
+   EMPTY STATE
+   =========================== */
+.empty-table {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-muted);
+}
+/* ===========================
+   DETAIL PAGES
+   =========================== */
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--bg-border);
+    gap: 16px;
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    min-width: 120px;
+    padding-top: 2px;
+}
+
+.detail-value {
+    font-size: 13px;
+    color: var(--text-primary);
+    text-align: right;
+    flex: 1;
+}
+
+.page-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+.btn-primary {
+    background: var(--accent);
+    color: var(--accent-text);
+    font-family: inherit;
+}
