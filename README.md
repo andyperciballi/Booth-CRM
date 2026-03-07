@@ -76,8 +76,8 @@ Trello Board
 
 - Icons from https://heroicons.com  
 - UI inspiration from modern CRM dashboards (Salesforce, HubSpot)
-
-ChatGPt, Claude Sonnet, Opus,  Haiku for code planning, duplication and troubleshooting
+- General Assembly Sessions, lessions and course notes
+- ChatGPt, Claude Sonnet, Opus,  Haiku for code planning, duplication and troubleshooting
 
 ## Next Steps
 
