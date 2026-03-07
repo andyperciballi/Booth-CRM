@@ -9,7 +9,6 @@
 </head>
 <body>
     <div class="login-subtitle" style="margin-top:16px">
-    Recruiter? <a href="{% url 'register' %}">Create a viewer account</a>
 </div>
     <div class="login-wrapper">
         <div class="login-box">
@@ -36,6 +35,7 @@
                 </div>
                 <button type="submit" class="login-btn">Sign In</button>
             </form>
+            <a href="{% url 'accounts_list' %}" class="btn btn-ghost" style="display:block; text-align:center; margin-top:12px">← Back to Browse</a>
         </div>
     </div>
 </body>
