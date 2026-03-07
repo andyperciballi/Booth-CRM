@@ -10,9 +10,9 @@ class Command(BaseCommand):
     help = 'Seed the database with realistic test data'
 
     def handle(self, *args, **kwargs):
-        if not settings.DEBUG:
-            self.stdout.write(self.style.ERROR('Seed command disabled in production!'))
-            return
+        # if not settings.DEBUG:
+           # self.stdout.write(self.style.ERROR('Seed command disabled in production!'))
+          #  return
         # Clear existing data
         Opportunity.objects.all().delete()
         Contact.objects.all().delete()
