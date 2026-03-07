@@ -16,10 +16,8 @@ The goal of BoothCRM is to provide a **clean, minimal CRM-style tool** for manag
 ## Getting Started
 
 **Deployed App:**  
-https://your-deployment-link.com
 
 **Planning Materials:**  
-https://your-planning-doc-link.com
 
 Basic workflow:
 1. Add a company account
@@ -33,10 +31,8 @@ Basic workflow:
 - JavaScript  
 - HTML  
 - CSS  
-- Node.js  
-- Express  
-- MongoDB  
-
+- python
+- Django
 ---
 
 ## Attributions
