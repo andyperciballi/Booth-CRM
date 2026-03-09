@@ -458,6 +458,8 @@ td {
     border-bottom: 1px solid var(--table-row-border);
     color: var(--text-secondary);
     vertical-align: middle;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 tr:last-child td {
@@ -686,9 +688,4 @@ hr {
     display: flex;
     gap: 10px;
     align-items: center;
-}
-.btn-primary {
-    background: var(--accent);
-    color: var(--accent-text);
-    font-family: inherit;
 }
