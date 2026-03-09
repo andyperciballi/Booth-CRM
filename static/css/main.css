@@ -299,18 +299,6 @@ a:hover {
     font-family: inherit;
     -webkit-appearance: none;
     appearance: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 9px 18px;
-    border-radius: 5px;
-    font-size: 12px;
-    font-weight: 700;
-    cursor: pointer;
-    border: none;
-    transition: all 0.15s;
-    text-decoration: none;
-    letter-spacing: 0.5px;
 }
 
 .btn-primary {
